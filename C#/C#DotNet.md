@@ -126,6 +126,7 @@ In the **Main method** put the below code snippet:
 
 ## Step 5
 The next step is to run the .NET Application. To run any program in Visual Studio, you just need to click on the Start button or you can press **CTRL+F5** as shown in the below image.
+
 ![VS](https://dotnettutorials.net/wp-content/uploads/2022/07/word-image-27425-9-1.png)
 
 
@@ -137,16 +138,22 @@ Suppose you want to use some classes and interfaces in your code, then you have 
 For example, if you are going to use the Console class in your code, then you have to include the System namespace as the Console class belongs to the System namespace.
 
 **Syntax:** using NamespaceName;
+
 **Example:** using System;
 
 If the required namespace is a member of another namespace, we have to specify the parent and child namespaces separated by a dot as follows:
+
 **using System.Data;**
+
 **using System.IO;**
+
 **Note: A namespace is a container that contains a group of related classes and interfaces, as well as, a namespace can also contain other namespaces.**
 
 ## Namespace Declaration Section:
 Here a user-defined namespace is declared. In .NET applications, all classes and interfaces or any type related to the project should be declared inside some namespace. Generally, we put all the related classes under one namespace and in a project, we can create multiple namespaces.
+
 **Syntax:** namespace NamespaceName {}
+
 **Example:** namespace MyFirstProject {}
 
 Generally, the namespace name will be the same as the project name but it is not mandatory, you can give any user-defined name to the namespace.
