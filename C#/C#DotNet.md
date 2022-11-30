@@ -86,27 +86,36 @@ Based on the features, we can define **C# as just a Simple, Secure, Robust, Port
 ![Basic structure](https://dotnettutorials.net/wp-content/uploads/2022/07/word-image-27425-1.png)
 
 The above process is shown below:
+
 ![structure C#](https://dotnettutorials.net/wp-content/uploads/2022/07/word-image-27425-2-1.png)
+
 **Note:** C# is case sensetive and every statement in C# should end with a semicolon.
 
 # Creating our first Console App on VS:
 
 ## Step 1
 First, open Visual Studio 2022 (the latest version at this point in time) and then click on the **Create a New Project** option as shown in the below image.
-[VS](https://dotnettutorials.net/wp-content/uploads/2022/07/creating-the-first-console-application-using-visua-1024x518.png)
+
+![VS](https://dotnettutorials.net/wp-content/uploads/2022/07/creating-the-first-console-application-using-visua-1024x518.png)
 
 ## Step 2
 The next step is to choose the project type as a Console Application.Here, I am selecting Console App (.NET Framework) using C# Language and then clicking on the Next button as shown in the below image.
-[VS1](https://dotnettutorials.net/wp-content/uploads/2022/07/creating-first-console-application-using-visual-st-1024x611.png)
+
+![VS1](https://dotnettutorials.net/wp-content/uploads/2022/07/creating-first-console-application-using-visual-st-1024x611.png)
 
 ## Step 3
 The next step is to configure the new project. Here, you also need to provide the .NET Framework version that you want to use in this application. The latest version of the .NET Framework is 4.8. So, I am selecting .NET Framework 4.8 and then clicking on the Create button as shown in the below image.
-[VS2](https://dotnettutorials.net/wp-content/uploads/2022/07/creating-first-console-application-using-visual-st-1-1024x698.png)
+
+![VS2](https://dotnettutorials.net/wp-content/uploads/2022/07/creating-first-console-application-using-visual-st-1-1024x698.png)
+
 Once you click on the **Create** button, the following project structure will be created
-[VS3](https://dotnettutorials.net/wp-content/uploads/2022/07/word-image-27425-6-1.png)
+
+![VS3](https://dotnettutorials.net/wp-content/uploads/2022/07/word-image-27425-6-1.png)
+
 The **solution name** will contain all necessary required files (Properties, Reference, App.Config files) to run the Console application.
 The Main program **Program.cs** is the default code file that is creared when a new console application is created in VS, it contains the **Main Method** by default and that where the execution will start at. The **Program.cs** file will look like below:
-[VS4](https://dotnettutorials.net/wp-content/uploads/2022/07/console-application-program-file.png)
+
+![VS4](https://dotnettutorials.net/wp-content/uploads/2022/07/console-application-program-file.png)
 
 ## Step 4
 In the **Main method** put the below code snippet:
@@ -114,9 +123,12 @@ In the **Main method** put the below code snippet:
             Console.WriteLine("Welcome to C#.NET");
             Console.ReadKey();
 ```
+
 ## Step 5
 The next step is to run the .NET Application. To run any program in Visual Studio, you just need to click on the Start button or you can press **CTRL+F5** as shown in the below image.
-https://dotnettutorials.net/wp-content/uploads/2022/07/word-image-27425-9-1.png
+![VS](https://dotnettutorials.net/wp-content/uploads/2022/07/word-image-27425-9-1.png)
+
+
 
 # Let’s understand each of the above sections in detail.
 ## Importing Namespace Section:
