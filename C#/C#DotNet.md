@@ -178,11 +178,50 @@ When we create a Console Application using Visual Studio, by default, Visual Stu
 
 
 ## Main() Method Section:
-
 The main() method is the entry point or starting point of the application to start its execution. When the application starts executing, the main method will be the first block of the application to be executed. The Main method contains the main logic of the application.
 
 
 ## What is using?
-
 Using is a keyword. Using this keyword, we can refer to .NET BCL in C# Applications i.e. including the BCL namespaces as well as we can also include user-defined namespaces.
+
+
+
+# Data Types in C#
+
+## What is a Data Type in C#?
+The Datatypes are something that gives information about
+
+1. **Size** of the memory location.
+2. The **Range of data** that can be stored inside that memory location.
+3. Possible **Legal Operations** that can be performed on that memory location.
+4. What **Types of Results** come out from an expression when these types are used inside that expression?
+
+The keyword which gives all the above information is called the data type in C#.
+
+
+## Diffrent types of data types in C#
+A data type in C# specifies the type of data that a variable can store such as integer, floating, boolean, character, string, etc. The following diagram shows the different types of data types available in C#.
+
+![VS5](https://dotnettutorials.net/wp-content/uploads/2022/07/data-types-in-c.jpeg)
+
+There are 3 types of data types available in the C# language.
+
+1. Value Data Types
+2. Reference Data Types
+3. Pointer Data Types
+
+
+## Value Data Type in C#
+The data type  which stores the value directly in the memory is called the Value Data Type in C#. The examples are int, char, boolean, and float which store numbers, alphabets, true/false, and floating-point numbers respectively. If you check the definition of these data types then you will see that the type of all these data types is going to be a struct. And struct is a value type in C#. The value data types in C# again classified into two types are as follows.
+
+1. Predefined Data Types – Example includes Integer, Boolean, Boolean, Long, Double, Float, etc.
+2. User-defined Data Types – Example includes Structure, Enumerations, etc
+
+
+## How Data is Represented in a Computer?
+**Before going and discussing how to use data types, first, we need to understand How data is represented on a computer? Let us understand this. Please have a look at the below diagram. See, on your computer’s hard disk, you have some data, let’s say A. The data can be in different formats, it can be an image, it can be an alphabet, it can be digits, it can be a PDF File, etc. Let us assume that you have some data called A. Now, we know the computer can only understand binary numbers i.e. 0’s and 1’s. So, the letter A is represented in the computer as 8 bits i.e. 01000001 (65 is the ASCII Value is A and hence the decimal number 65 is converted to its binary equivalent binary representation which is 01000001). So, the 0’s and 1’s are called bits. So, to store any data on the computer we need this 8-bit format. And this complete 8-bit is called a Byte. Now, as a dot net developer, it is very difficult for us to represent the data in binary format i.e. using 0s and 1s. So, here, in C# language we can use the decimal format. So, what we can do is, we will convert binary to decimal format, and internally the computer will map the decimal format to byte format (binary format), and then by using the byte we can represent the data. So, you can observe the byte representation of decimal number 65 is 01000001.**
+
+![VS6](https://dotnettutorials.net/wp-content/uploads/2018/07/How-Data-is-Represented-in-a-Computer-768x634.jpg)
+
+## What is a Byte Data Type in C#
 
