@@ -120,3 +120,233 @@ namespace LINQDemo
 Let us have a look at the following diagram to understand Method Syntax.
 
 ![Method Syntax Diagram](https://dotnettutorials.net/wp-content/uploads/2019/04/c-users-pranaya-pictures-method-syntax-png.png)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## Side LINQ Notes
+A query expression in C# is, as you probably know, just a syntactic sugar for a bunch of method calls. For example,
+
+```csharp
+	from customer in customers
+	where customer.City == "London"
+	select customer.LastName
+```
+
+is a syntactic sugar for:
+
+```csharp
+	customers.
+  		Where(customer => customer.City == "London").
+  		Select(customer => customer.LastName)
+```
+
+A great many queries are straightforward variations on this pattern: **the query is translated into a series of method calls where the arguments are lambdas formed from the range variables and expressions in the query**. However, some of them are weird. This one is straightforward:
+
+```csharp
+	from parent in parents
+	from child in parent.Children
+	select child.LastName
+```
+
+The meaning here is **“take the sequence of parents, map each parent onto a sequence of children, concatenate all those sequences, and then project from the concatenation the sequence of last names”**. That’s equivalent to this method call:
+
+```csharp
+	parents.SelectMany(
+  		parent => parent.Children, 
+  		(parent, child) => child.LastName)
+```
+
+The first lambda maps each element of the original sequence onto a new sequence. The second lambda takes each element of the new sequence and the element from which it was created, and does the projection. Note that parent is in scope in the final **select** clause; we’re not using that fact here, but it is important.
+
+Now let’s make a small variation, and we’ll see that things get very not-straightforward very quickly:
+
+```csharp
+	from parent in parents
+	from child in parent.Children
+	where child.Height > parent.Height
+	select child.LastName
+```
+Query translation is a multi-step process where each step along the way turns some of the query elements into method calls and lambdas. Since progress is always made towards the goal of eliminating the query altogether, and there is never any ambiguity about what rule to apply next, we know that we can just keep on applying rules until we’re done. The C# specification says that the first step of the translation from this query into method calls is to translate it into this query:
+
+```csharp
+	from * in parents.
+  		SelectMany(
+    			parent => parent.Children, 
+    			(parent, child) => new { parent, child })
+	where child.Height > parent.Height
+	select child.LastName
+```
+And the second step is to translate that into:
+
+```csharp
+	from * in parents.
+  		SelectMany(
+    			parent => parent.Children, 
+    			(parent, child) => new { parent, child }).
+  		Where(* => child.Height > parent.Height)
+	select child.LastName
+```
+And the third step is to translate that into:
+
+```csharp
+	parents.
+  		SelectMany(
+    			parent => parent.Children, 
+    			(parent, child) => new { parent, child }).
+  		Where(* => child.Height > parent.Height).
+  	Select(* => child.LastName)
+```
+Um. That’s not C#.
+
+What on earth are those stars doing in there?
+
+For the most part the query syntax can be transformed syntactically into the method call syntax, but in this query that breaks down. The * is a transparent identifier” and it means:
+
+- I am a lambda formal parameter of anonymous type
+- Members of my type are in scope in the body of the lambda
+- If any of my members are themselves transparent identifiers, their members are in scope too, and so on, to any level of nesting
+
+**(Recall once again as we have discussed many times on this blog, the scope of a particular programming language element is defined as the region of program text in which it may be referred to by its unqualified name. Scope is entirely about figuring out the meaning of names in C#.)**
+
+In other words, the star means that there is one more stage of translation to go through, and it’s a semantic, not a syntactic transformation because we must understand the meanings of the identifiers in the lambda bodies. The final transformation is:
+
+```csharp
+	parents.
+  		SelectMany(
+    			parent => parent.Children, 
+    			(parent, child) => new { parent, child }). 
+  // We've selected a sequence where elements have anonymous type,
+  // so "dummy" is of anonymous type in both lambdas:
+  		Where(dummy => dummy.child.Height > dummy.parent.Height).
+  		Select(dummy => dummy.child.LastName)
+```
+Think about what is going on here. The select-many query is essentially concatenating together many sequences of pairs of parents and children, and then running the remainder of the query on those pairs. Clearly this works but it seems absurdly complicated. Were the language designers crazy when this was added to the specification? Why is there this absolutely bizarre new scoping rule being introduced?
+
+They were not crazy; there is a good reason for this. Let’s deduce what it is by first attempting to do things the naive way, and we’ll see what goes wrong.
+
+We will start over and design a new query translation rule set and LINQ-to-objects implementation from scratch. We need to translate the query shown above somehow such that the following is true of the translated form:
+
+- **parent** is in scope starting at the second **from** and continuing until the end of the query.
+- **child** in in scope starting at the **where** and continuing until the end of the query.
+- the semantics of a nested **from** query are: take a sequence, map each element to a new sequence, and concatenate all the resulting sequences.
+
+This seems easily done with a very straightforward rule. Let’s suppose we have these very simple methods: (Error handling is removed for clarity.)
+
+```csharp
+public static IEnumerable<R> Select<A, R>(
+  this IEnumerable<A> items, 
+  Func<A, R> projection)
+{
+  foreach(A item in items)
+    yield return projection(item);
+}
+
+public static IEnumerable<R> SelectMany<A, R>(
+  this IEnumerable<A> items, 
+  Func<A, IEnumerable<R>> map)
+{
+  foreach(A outerItem in items)
+    foreach(R innerItem in map(outerItem))
+      yield return innerItem;
+}
+
+public static IEnumerable<A> Where<A>(
+  this IEnumerable<A> items, 
+  Func<A, bool> predicate)
+{
+  foreach(A item in items)
+    if (predicate(item)) 
+      yield return item;
+}
+```
+Very straightforward. Let’s now state the following translation rules:
+
+### The Where Rule:
+
+```csharp 
+	from x in y 
+	where z 
+	... 
+```
+
+is translated to
+```csharp
+	from x in (y).Where(x => z)
+	... 
+```
+
+### The Select rule:
+
+```csharp
+	from x in y 
+	select z
+```
+
+is translated to
+```csharp
+	(y).Select(x => z)
+```
+(We’ll ignore optimizing away degenerate queries.)
+
+### The Select Many rule:
+```csharp
+	from x in y 
+	from q in r 
+	...
+```
+
+is translated to
+```csharp
+	(y).SelectMany(x => from q in r ...)
+```
+
+These seem like reasonable rules. Let’s try them on our example:
+```csharp
+	from parent in parents
+	from child in parent.Children
+	where child.Height > parent.Height
+	select child.LastName
+```
+
+We first apply the **SelectMany** rule to obtain:
+```csharp
+	(parents).
+  		SelectMany( 
+    			parent => 
+      				from child in parent.Children
+      				where child.Height > parent.Height
+      				select child.LastName )
+```
+
+Seems reasonable. Now we apply the Where rule to that:
+```csharp
+	(parents).
+  		SelectMany( 
+    			parent => 
+      				from child in (parent.Children).
+        				Where(child => child.Height > parent.Height)
+      				select child.LastName)
+```
+
+Then we apply the Select rule to that:
+```csharp
+	(parents).
+  		SelectMany( 
+    			parent => 
+      				((parent.Children).
+        				Where(child => child.Height > parent.Height)).
+        				Select(child => child.LastName));
+```
+
+This looks great! If you actually compiled the methods, you’d end up with an expression that takes a sequence of parents and returns a sequence of last names, which is just what we want. **Why on earth then does the C# spec not do this very simple thing, instead of the crazy complicated nonsense where SelectMany takes multiple lambdas and introduces a “transparent identifier”**? I normally push back on “why not?” questions, but this one seems justified; there must be something wrong with the naive approach that prevented the C# design team from going for it, causing them to introduce a far more complicated mechanism. What could that reason be?
